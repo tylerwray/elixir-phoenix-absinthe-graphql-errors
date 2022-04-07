@@ -1,18 +1,66 @@
-# MyApp
+# GraphQL error separation best practices
 
-To start your Phoenix server:
+This is an example repository showing how to implement a better separation of Errors in GraphQL so that
+not all non-expected results are "Errors". See https://www.youtube.com/watch?v=RDNTP66oY2o
 
-  * Install dependencies with `mix deps.get`
-  * Start Phoenix endpoint with `mix phx.server`
+You can spin up the phoenix app with `mix phx.server` and launch graphiql at `localhost:4000/graphiql`.
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+You can then run a series of request with the following mutation to see different outcomes:
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+```graphql
+mutation CreatePaymentRequest($accountUid: ID!, $amount: Int!, $readerUid: ID) {
+  createPaymentRequest(
+    accountUid: $accountUid
+    amount: $amount
+    readerUid: $readerUid
+  ) {
+    ... on PaymentRequest {
+      uid
+      amount
+      accountUid
+      paymentMethods
+    }
+    ... on LimitReached {
+      limit
+    }
+    ... on UnavailableReader {
+      readerStatus
+    }
+    __typename
+  }
+}
+```
 
-## Learn more
+## PaymentRequest
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Send anything as `accountUid` and an integer `amount` to see the `PaymentRequest` response:
+
+```json
+{
+  "accountUid": "e7769c87-a11d-4b9d-be24-091c41af2ff3",
+  "amount": 1200
+}
+```
+
+## LimitReached
+
+Send `accountUid` as `limit_reached` to see the `LimitReached` response:
+
+```json
+{
+  "accountUid": "limit_reached",
+  "amount": 1200
+}
+```
+
+## UnavailableReader
+
+Send `readerUid` as `unavailable` to see the `UnavailableReader` response:
+
+```json
+{
+  "accountUid": "901aa71e-2c67-49f0-a057-b31962bfb146",
+  "amount": 1200,
+  "readerUid": "unavailable"
+}
+```
