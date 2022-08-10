@@ -1,13 +1,13 @@
-defmodule MyAppWeb.Schema.PaymentRequestTypes do
+defmodule MyAppWeb.Schema.InvoiceTypes do
   use Absinthe.Schema.Notation
 
   enum :payment_method, values: [:card, :bank_transfer, :bnpl]
 
-  object :payment_request do
+  object :invoice do
     field :uid, :id
     field :account_uid, :id
     field :amount, :integer
-    field :payment_methods, list_of(:payment_method)
+    field :allowed_payment_methods, list_of(:payment_method)
   end
 
   object :limit_reached do
@@ -18,13 +18,13 @@ defmodule MyAppWeb.Schema.PaymentRequestTypes do
     field :reader_status, :string
   end
 
-  union :create_payment_request_result do
-    description "A result when creating a payment request"
+  union :create_invoice_result do
+    description "A result when creating an invoice"
 
-    types [:payment_request, :limit_reached, :unavailable_reader]
+    types [:invoice, :limit_reached, :unavailable_reader]
 
     resolve_type fn
-      %{uid: _}, _ -> :payment_request
+      %{uid: _}, _ -> :invoice
       %{limit: _}, _ -> :limit_reached
       %{reader_status: _}, _ -> :unavailable_reader
     end

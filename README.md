@@ -5,20 +5,20 @@ not all non-expected results are "Errors". See https://www.youtube.com/watch?v=R
 
 You can spin up the phoenix app with `mix phx.server` and launch graphiql at `localhost:4000/graphiql`.
 
-You can then run a series of request with the following mutation to see different outcomes:
+You can then run a series of requests with the following mutation to see different outcomes:
 
 ```graphql
-mutation CreatePaymentRequest($accountUid: ID!, $amount: Int!, $readerUid: ID) {
-  createPaymentRequest(
+mutation CreateInvoice($accountUid: ID!, $amount: Int!, $readerUid: ID) {
+  createInvoice(
     accountUid: $accountUid
     amount: $amount
     readerUid: $readerUid
   ) {
-    ... on PaymentRequest {
+    ... on Invoice {
       uid
       amount
       accountUid
-      paymentMethods
+      allowedPaymentMethods
     }
     ... on LimitReached {
       limit
@@ -31,14 +31,16 @@ mutation CreatePaymentRequest($accountUid: ID!, $amount: Int!, $readerUid: ID) {
 }
 ```
 
-## PaymentRequest
+## Invoice
 
-Send anything as `accountUid` and an integer `amount` to see the `PaymentRequest` response:
+Send anything as `accountUid` and an integer `amount` to see the `Invoice` response:
 
 ```json
 {
+  "uid": "e7769c87-a11d-4b9d-be24-091c41af2ff3",
   "accountUid": "e7769c87-a11d-4b9d-be24-091c41af2ff3",
-  "amount": 1200
+  "amount": 1200,
+  "allowedPaymentMethods": ["CARD"]
 }
 ```
 

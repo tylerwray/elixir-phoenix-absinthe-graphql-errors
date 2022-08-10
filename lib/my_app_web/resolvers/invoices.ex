@@ -1,10 +1,10 @@
-defmodule MyAppWeb.Resolvers.PaymentRequest do
-  alias MyApp.Payments
+defmodule MyAppWeb.Resolvers.Invoices do
+  alias MyApp.Invoices
 
   def create(_parent, params, _resolution) do
-    case Payments.create_payment_request(params) do
-      {:ok, payment_request} ->
-        {:ok, payment_request}
+    case Invoices.create(params) do
+      {:ok, invoice} ->
+        {:ok, invoice}
 
       {:error, {:limit_reached, limit}} ->
         {:ok, %{limit: limit}}

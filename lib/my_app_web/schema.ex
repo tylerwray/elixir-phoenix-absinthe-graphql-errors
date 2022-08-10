@@ -1,7 +1,7 @@
 defmodule MyAppWeb.Schema do
   use Absinthe.Schema
 
-  import_types MyAppWeb.Schema.PaymentRequestTypes
+  import_types MyAppWeb.Schema.InvoiceTypes
 
   alias MyAppWeb.Resolvers
 
@@ -12,14 +12,14 @@ defmodule MyAppWeb.Schema do
   end
 
   mutation do
-    @desc "Create a payment request"
-    field :create_payment_request, :create_payment_request_result do
+    @desc "Create an invoice"
+    field :create_invoice, :create_invoice_result do
       arg :amount, non_null(:integer)
-      @desc "The UID of the account from which to make the payment request"
+      @desc "The UID of the account from which to make the invoice"
       arg :account_uid, non_null(:id)
       arg :reader_uid, :id
 
-      resolve &Resolvers.PaymentRequest.create/3
+      resolve &Resolvers.Invoices.create/3
     end
   end
 end

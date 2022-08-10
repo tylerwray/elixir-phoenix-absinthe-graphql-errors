@@ -1,15 +1,15 @@
 defmodule MyAppWeb.GraphQLTest do
   use MyAppWeb.ConnCase, async: true
 
-  test "returns a payment request", %{conn: conn} do
+  test "returns an invoice", %{conn: conn} do
     mutation = """
-    mutation CreatePaymentRequest($accountUid: ID!, $amount: Int!) {
-      createPaymentRequest(accountUid: $accountUid, amount: $amount) {
-        ... on PaymentRequest {
+    mutation CreateInvoice($accountUid: ID!, $amount: Int!) {
+      createInvoice(accountUid: $accountUid, amount: $amount) {
+        ... on Invoice {
           uid
           amount
           accountUid
-          paymentMethods
+          allowedPaymentMethods
         }
         ... on LimitReached {
           limit
@@ -28,12 +28,12 @@ defmodule MyAppWeb.GraphQLTest do
 
     assert %{
              "data" => %{
-               "createPaymentRequest" => %{
+               "createInvoice" => %{
                  "uid" => "7a53a356-f426-48ba-9d17-3cd3add62c30",
                  "amount" => 123_000,
                  "accountUid" => "35db6b7e-9493-4474-916f-37c04a137a86",
-                 "paymentMethods" => ["CARD", "BANK_TRANSFER"],
-                 "__typename" => "PaymentRequest"
+                 "allowedPaymentMethods" => ["CARD", "BANK_TRANSFER"],
+                 "__typename" => "Invoice"
                }
              }
            } = body
@@ -41,13 +41,13 @@ defmodule MyAppWeb.GraphQLTest do
 
   test "returns limit reached result", %{conn: conn} do
     mutation = """
-    mutation CreatePaymentRequest($accountUid: ID!, $amount: Int!) {
-      createPaymentRequest(accountUid: $accountUid, amount: $amount) {
-        ... on PaymentRequest {
+    mutation CreateInvoice($accountUid: ID!, $amount: Int!) {
+      createInvoice(accountUid: $accountUid, amount: $amount) {
+        ... on Invoice {
           uid
           amount
           accountUid
-          paymentMethods
+          allowedPaymentMethods
         }
         ... on LimitReached {
           limit
@@ -66,7 +66,7 @@ defmodule MyAppWeb.GraphQLTest do
 
     assert %{
              "data" => %{
-               "createPaymentRequest" => %{
+               "createInvoice" => %{
                  "limit" => 1000,
                  "__typename" => "LimitReached"
                }
@@ -76,17 +76,17 @@ defmodule MyAppWeb.GraphQLTest do
 
   test "returns reader unavailable result", %{conn: conn} do
     mutation = """
-    mutation CreatePaymentRequest($accountUid: ID!, $amount: Int!, $readerUid: ID) {
-      createPaymentRequest(
+    mutation CreateInvoice($accountUid: ID!, $amount: Int!, $readerUid: ID) {
+      createInvoice(
         accountUid: $accountUid
         amount: $amount
         readerUid: $readerUid
       ) {
-        ... on PaymentRequest {
+        ... on Invoice {
           uid
           amount
           accountUid
-          paymentMethods
+          allowedPaymentMethods
         }
         ... on LimitReached {
           limit
@@ -112,7 +112,7 @@ defmodule MyAppWeb.GraphQLTest do
 
     assert %{
              "data" => %{
-               "createPaymentRequest" => %{
+               "createInvoice" => %{
                  "readerStatus" => "requires_update",
                  "__typename" => "UnavailableReader"
                }
